@@ -202,11 +202,27 @@ int main(int argc, char *argv[]) {
       std::cout << "For expansion of a file, please enter: \n lzw435 e filename \n"; 
    } else {
       if(argv[1][0] == 'c'){
-         std::cout << "Compressing the document...";
+         std::cout << "Compressing the document... \n";
+         std::string fileName = argv[2];
+         //Create the file to read in from
+         std::fstream inputFile(fileName);
+         //Create the file to write the compression too
+         std::string outputFile(fileName + ".lzw");
+         //create the string to read the lines into
+         std::string currentLine;
+         if(inputFile.is_open()){
+            while(getline(inputFile, currentLine)){
+               std::cout << "hey we made to getting a line\n";
+            }
+         }
+         else{
+            std::cout << "Error: Could not open file given.\n";
+         }
       }else if(argv[1][0] == 'e'){
          std::cout << "Expanding the document...";
       }
    }
+   /*
   std::vector<int> compressed;
   compress("AAAAAAABBBBBB", std::back_inserter(compressed));
   for(auto itr=compressed.begin(); itr !=compressed.end(); itr++)
@@ -216,7 +232,7 @@ int main(int argc, char *argv[]) {
   std::cout << "\nfinal decompressed:" << decompressed << std::endl;
   
   //demo as the name suggests
-  binaryIODemo(compressed);
+  binaryIODemo(compressed); */
   
   return 0;
 }
