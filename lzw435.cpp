@@ -207,12 +207,21 @@ int main(int argc, char *argv[]) {
          //Create the file to read in from
          std::fstream inputFile(fileName);
          //Create the file to write the compression too
-         std::string outputFile(fileName + ".lzw");
+         std::string outputFileName(fileName + ".lzw");
+         std::ofstream outputFile(outputFileName);
          //create the string to read the lines into
          std::string currentLine;
          if(inputFile.is_open()){
             while(getline(inputFile, currentLine)){
-               std::cout << "hey we made to getting a line\n";
+               //Now we need to compress each line
+               std::vector<int> compressed;
+               compress(currentLine, std::back_inserter(compressed));
+               //Now that we have the compressed version, we need to write it to the output file
+               for(auto itr=compressed.begin(); itr != compressed.end(); itr++){
+                  if(outputFile.is_open()){
+                     std::cout << "Hey we made it to writing the output file";
+                  }
+               }
             }
          }
          else{
