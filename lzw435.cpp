@@ -224,7 +224,7 @@ int main(int argc, char *argv[]) {
                   }
                   //else error opening file
                   else{
-                     std::cout << "Error opening output file: " << outputFileName;
+                     std::cout << "Error opening output file: " << outputFileName << "\n";
                   }
                }
             }
@@ -232,6 +232,7 @@ int main(int argc, char *argv[]) {
          else{
             std::cout << "Error: Could not open file given.\n";
          }
+         std::cout << "Compresion completed. \nFinalized document: " << outputFileName << "\n";
       }else if(argv[1][0] == 'e'){
          std::cout << "Expanding the document...";
       }
