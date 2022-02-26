@@ -196,7 +196,13 @@ void binaryIODemo(std::vector<int> compressed) {
  
 // demo of how LZW works
 
-int main() {
+int main(int argc, char *argv[]) {
+   if((argc != 3 || argv[1][0]!='c') && (argc !=3 || argv[1][0]!='e')){
+      std::cout << "Wrong format. \nFor Compression of a file, please enter: \n lzw435 c filaname \n";
+      std::cout << "For expansion of a file, please enter: \n lzw435 e filename \n"; 
+   } else {
+      
+   }
   std::vector<int> compressed;
   compress("AAAAAAABBBBBB", std::back_inserter(compressed));
   for(auto itr=compressed.begin(); itr !=compressed.end(); itr++)
