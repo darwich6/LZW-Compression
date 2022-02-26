@@ -201,7 +201,11 @@ int main(int argc, char *argv[]) {
       std::cout << "Wrong format. \nFor Compression of a file, please enter: \n lzw435 c filaname \n";
       std::cout << "For expansion of a file, please enter: \n lzw435 e filename \n"; 
    } else {
-      
+      if(argv[1][0] == 'c'){
+         std::cout << "Compressing the document...";
+      }else if(argv[1][0] == 'e'){
+         std::cout << "Expanding the document...";
+      }
    }
   std::vector<int> compressed;
   compress("AAAAAAABBBBBB", std::back_inserter(compressed));
