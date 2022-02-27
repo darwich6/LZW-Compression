@@ -213,31 +213,10 @@ int main(int argc, char *argv[]) {
          stat(inputFileName.c_str(), &fileStatus);
          long fileSize = fileStatus.st_size;
 
-         //read into a char array the contents of a file
-         char characterArray[fileSize];
-         inputFile.read(characterArray, fileSize);
-
-         //create the finalString and a count for byte size comparison
-         std::string finalString = "";
-         long counter = 0;
-         while(counter < fileSize){
-            //grab the current character and create and empty binary string to convert it too
-            unsigned char currentChar = (unsigned char) characterArray[counter];
-            std::string binaryString = "";
-
-            //construct loop to convert input to binary
-            for(int j = 0; j < fileSize && currentChar > 0; j++){
-               //if the character is even, it becomes a 0 in binary
-               if(currentChar % 2 == 0){
-                  binaryString = "0" + binaryString;
-               } else {
-                  //if the character is odd, it becomes a 1 in binary
-                  binaryString = "1" + binaryString;
-               }
-               currentChar = currentChar >> 1;
-            }
-            std::cout << "binary String: \n" << binaryString;
-            counter++;
+         char currentChar;
+         //read in the input character by character
+         while(inputFile.get(currentChar)){
+            std::cout << "Current char: " << currentChar << "\n";
          }
 
          
