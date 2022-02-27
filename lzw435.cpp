@@ -213,45 +213,54 @@ int main(int argc, char *argv[]) {
          stat(inputFileName.c_str(), &fileStatus);
          long fileSize = fileStatus.st_size;
 
-         char currentChar;
-         std::string inputString = "";
-         //read in the input character by character
-         if(inputFile.is_open()){
-            std::cout << "Compressing input file given.. \n";
-            while(inputFile.get(currentChar)){
-               inputString += currentChar;
-            }
-         }else{
-            std::cerr << "Could not open input file. \n";
-            exit(1);
-         }
+         //read in the input line by line
+         char totalString[fileSize];
+         inputFile.read(totalString, fileSize);
+         inputFile.close();
 
-         //compress the input string and store it in a vector of ints
+         std::cout << "Total String: " << totalString << "\n";
+
+         //compress the inputted string
          std::vector<int> compressed;
-         compress(inputString, std::back_inserter(compressed));
+         compress(totalString, std::back_inserter(compressed));
 
-         std::cout << "InputString: " << inputString << "\n";
-         
-         //now that they are compressed write them to an output file.
-         std::string outFileName = inputFileName + ".lzw";
-         std::ofstream outputFile(outFileName);
-         if(outputFile.is_open()){
-            //if the output file is open, write them to it
-            for(auto itr = compressed.begin(); itr != compressed.end(); itr++){
-               std::cout << "Compressed Vector: " << *itr << "\n";
-            }
-         }else{
-            std::cerr << "Error opening output file.";
-            exit(1);
+         //convert the compressed string into a binary string
+         std::string currentBString = "";
+         std::string totalBString = "";
+         for(std::vector<int>::iterator it = compressed.begin(); it != compressed.end(); ++it){
+            //Assuming 12 bits
+            int bits = 12;
+            currentBString = int2BinaryString(*it, bits);
+            std::cout << "value=" << *it <<" : binary string="<<currentBString<<"; back to code=" << binaryString2Int(currentBString)<<"\n";
+            totalBString += currentBString;
          }
-         //output success
-         std::cout << "Compression complete.";
+         //we must make sure the length of the binary string is a multiple of 12 before we can write to the file
+         std::string zeros = "000000000000";
+         std::string outputFileName = inputFileName + ".lzw";
+         std::ofstream outputFile(outputFileName);
+         if(totalBString.size() % 12 != 0){
+            totalBString += zeros.substr(0, 12 - totalBString.size() % 12);
+         }
+         int b;
+         for(int i = 0; i < totalBString.size(); i += 12 ){
+            b = 1;
+            for(int j = 0; j < 12; j++){
+               b = b << 1;
+               if(totalBString.at(i+j) == '1'){
+                  b+=1;
+               }
+            }
+            //write to the file byte by byte
+            char currentChar = (char) (b & 255);
+            outputFile.write(&currentChar, 1);
+         }
+         outputFile.close();
+      }else if (argv[1][0] == 'e'){
 
-      }else if(argv[1][0] == 'e'){
       }
-   } 
-   
-  /*std::vector<int> compressed;
+   }
+   /*
+  std::vector<int> compressed;
   compress("AAAAAAABBBBBB", std::back_inserter(compressed));
   for(auto itr=compressed.begin(); itr !=compressed.end(); itr++)
         std::cout<<"\n"<<*itr;
