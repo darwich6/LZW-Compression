@@ -214,27 +214,23 @@ int main(int argc, char *argv[]) {
          long fileSize = fileStatus.st_size;
 
          char currentChar;
-         std::string binaryString = "";
+         std::string inputString = "";
          //read in the input character by character
          if(inputFile.is_open()){
             std::cout << "Compressing input file given.. \n";
             while(inputFile.get(currentChar)){
-               int currentInt = (int) currentChar;
-               /* if the currentInt is greater 48, this means that the currentChar was actually
-                  a number and due to ASCI conversion, it will be that number + 48, to counteract
-                  this, subtract 48 from all currentInts that are greater than 48. */
-               if(currentInt > 48){
-                  currentInt = currentInt - 48;
-               }   
-               binaryString = binaryString + int2BinaryString(currentInt, fileSize);
+               inputString += currentChar;
             }
          }else{
             std::cerr << "Could not open input file. \n";
+            exit(1);
          }
 
-         //store the binary string in a vector called compressed and compress them
+         //compress the input string and store it in a vector of ints
          std::vector<int> compressed;
-         compress(binaryString, std::back_inserter(compressed));
+         compress(inputString, std::back_inserter(compressed));
+
+         std::cout << "InputString: " << inputString << "\n";
          
          //now that they are compressed write them to an output file.
          std::string outFileName = inputFileName + ".lzw";
@@ -242,11 +238,14 @@ int main(int argc, char *argv[]) {
          if(outputFile.is_open()){
             //if the output file is open, write them to it
             for(auto itr = compressed.begin(); itr != compressed.end(); itr++){
-               outputFile << *itr;
+               std::cout << "Compressed Vector: " << *itr << "\n";
             }
          }else{
             std::cerr << "Error opening output file.";
+            exit(1);
          }
+         //output success
+         std::cout << "Compression complete.";
 
       }else if(argv[1][0] == 'e'){
       }
