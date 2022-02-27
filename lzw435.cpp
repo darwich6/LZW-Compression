@@ -214,10 +214,13 @@ int main(int argc, char *argv[]) {
          long fileSize = fileStatus.st_size;
 
          char currentChar;
+         std::string binaryString = "";
          //read in the input character by character
          while(inputFile.get(currentChar)){
-            std::cout << "Current char: " << currentChar << "\n";
+            int currentInt = (int) currentChar;
+            binaryString += int2BinaryString(currentInt, fileSize);
          }
+         std::cout << "Binary String: " << binaryString << "\n";
 
          
 
