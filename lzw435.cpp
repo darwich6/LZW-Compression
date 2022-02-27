@@ -216,27 +216,34 @@ int main(int argc, char *argv[]) {
          char currentChar;
          std::string binaryString = "";
          //read in the input character by character
-         while(inputFile.get(currentChar)){
-            int currentInt = (int) currentChar;
-            binaryString = binaryString + int2BinaryString(currentInt, fileSize);
+         if(inputFile.is_open()){
+            while(inputFile.get(currentChar)){
+               int currentInt = (int) currentChar;
+               binaryString = binaryString + int2BinaryString(currentInt, fileSize);
+            }
          }
-         std::cout << "Binary String: " << binaryString << "\n";
+
          //store the binary string in a vector called compressed and compress them
          std::vector<int> compressed;
          compress(binaryString, std::back_inserter(compressed));
          
          //now that they are compressed write them to an output file.
          std::string outFileName = inputFileName + ".lzw";
-         std::cout << "Output File Name: " << outFileName << "\n";
-         for(auto itr=compressed.begin(); itr != compressed.end(); itr++){
-            std::cout<< "Compressed: " << *itr << "\n";
+         std::ofstream outputFile(outFileName);
+         if(outputFile.is_open()){
+            //if the output file is open, write them to it
+            for(auto itr = compressed.begin(); itr != compressed.end(); itr++){
+               outputFile << *itr;
+            }
+         }else{
+            std::cerr << "Error opening output file.";
          }
 
       }else if(argv[1][0] == 'e'){
       }
    } 
    
-  std::vector<int> compressed;
+  /*std::vector<int> compressed;
   compress("AAAAAAABBBBBB", std::back_inserter(compressed));
   for(auto itr=compressed.begin(); itr !=compressed.end(); itr++)
         std::cout<<"\n"<<*itr;
@@ -245,7 +252,7 @@ int main(int argc, char *argv[]) {
   std::cout << "\nfinal decompressed:" << decompressed << std::endl;
   
   //demo as the name suggests
-  binaryIODemo(compressed); 
+  binaryIODemo(compressed); */
   
   return 0;
 }
