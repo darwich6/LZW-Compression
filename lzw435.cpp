@@ -256,9 +256,61 @@ int main(int argc, char *argv[]) {
          }
          outputFile.close();
       }else if (argv[1][0] == 'e'){
+         //Here we need to expand the given file
+         //create a file to read from given the input filename
+         std::string inputFileName = argv[2];
+         std::ifstream inputFile;
+         inputFile.open(inputFileName.c_str(), std::ios::binary);
 
+         //get the size of the file in bytes
+         struct stat fileStatus;
+         stat(inputFileName.c_str(), &fileStatus);
+         long fileSize = fileStatus.st_size;
+
+         //read in the contents into a character array
+         char characterArray[fileSize];
+         inputFile.read(characterArray, fileSize);
+
+         std::string zeros = "000000000000";
+         std::vector<int> compressed;
+         std::string totalString = "";
+         long counter = 0;
+         while(counter < fileSize){
+            unsigned char currentChar = (unsigned char) characterArray[counter];
+            std::string currentBString = "";
+            for(int j = 0; j < 12 && currentChar > 0; j++){
+               if(currentChar % 2 == 0){
+                  currentBString= "0" + currentBString;
+               }else{
+                  currentBString = "1" + currentBString;
+               }
+               currentChar = currentChar >> 1;
+            }
+            
+            //pad 0s to left if needed
+            currentBString = zeros.substr(0, 12 - currentBString.size()) + currentBString;
+            int currentInt = binaryString2Int(currentBString);
+            compressed.push_back(currentInt);
+            counter++;
+         }
+         inputFile.close();
+
+         //decompress the vector
+         std::string decompressed = decompress(compressed.begin(), compressed.end());
+         
+         //write the results to filename2
+         std::string outputFileName = inputFileName.substr(0, inputFileName.size() - 4) + "2";
+         std::ofstream outputFile(outputFileName);
+         if(outputFile.is_open()){
+            outputFile << decompressed;
+         }else{
+            std::cerr << "Error opening output file.";
+            exit(1);
+         }
+         outputFile.close();
       }
    }
+
    /*
   std::vector<int> compressed;
   compress("AAAAAAABBBBBB", std::back_inserter(compressed));
