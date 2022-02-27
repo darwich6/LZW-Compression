@@ -216,7 +216,16 @@ int main(int argc, char *argv[]) {
          //read into a char array the contents of a file
          char characterArray[fileSize];
          inputFile.read(characterArray, fileSize);
-         std::cout << characterArray;
+
+         //create the finalString and a count for byte size comparison
+         std::string finalString = "";
+         long counter = 0;
+         while(counter < fileSize){
+            std::cout << "Hey we made it into the while loop";
+
+            counter++;
+         }
+
          
 
 
