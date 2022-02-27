@@ -217,10 +217,19 @@ int main(int argc, char *argv[]) {
          std::string binaryString = "";
          //read in the input character by character
          if(inputFile.is_open()){
+            std::cout << "Compressing input file given.. \n";
             while(inputFile.get(currentChar)){
                int currentInt = (int) currentChar;
+               /* if the currentInt is greater 48, this means that the currentChar was actually
+                  a number and due to ASCI conversion, it will be that number + 48, to counteract
+                  this, subtract 48 from all currentInts that are greater than 48. */
+               if(currentInt > 48){
+                  currentInt = currentInt - 48;
+               }   
                binaryString = binaryString + int2BinaryString(currentInt, fileSize);
             }
+         }else{
+            std::cerr << "Could not open input file. \n";
          }
 
          //store the binary string in a vector called compressed and compress them
