@@ -221,7 +221,8 @@ int main(int argc, char *argv[]) {
          std::string finalString = "";
          long counter = 0;
          while(counter < fileSize){
-            std::cout << "Hey we made it into the while loop";
+            unsigned char currentChar = (unsigned char) characterArray[counter];
+            std::cout << currentChar << "bleh:  ";
 
             counter++;
          }
