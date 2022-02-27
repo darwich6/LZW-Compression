@@ -52,7 +52,7 @@ std::string decompress(Iterator begin, Iterator end) {
   std::map<int,std::string> dictionary;
   for (int i = 0; i < 256; i++)
     dictionary[i] = std::string(1, i);
- 
+
   std::string w(1, *begin++);
   std::string result = w;
   std::cout << "\ndecompressed: " << result <<";";
@@ -65,14 +65,14 @@ std::string decompress(Iterator begin, Iterator end) {
       entry = w + w[0];
     else
       throw "Bad compressed k";
- 
+
     result += entry;
     std::cout << "\ndecompressed: " << result <<";";
- 
+
     // Add w+entry[0] to the dictionary.
     if (dictionary.size()<4096)
       dictionary[dictSize++] = w + entry[0];
- 
+
     w = entry;
   }
   return result;
@@ -202,42 +202,15 @@ int main(int argc, char *argv[]) {
       std::cout << "For expansion of a file, please enter: \n lzw435 e filename \n"; 
    } else {
       if(argv[1][0] == 'c'){
-         std::cout << "Compressing the document... \n";
-         std::string fileName = argv[2];
-         //Create the file to read in from
-         std::fstream inputFile(fileName);
-         //Create the string name of the file to write the compression too
-         std::string outputFileName(fileName + ".lzw");
-         //create the string to read the lines into
-         std::string currentLine;
-         if(inputFile.is_open()){
-            while(getline(inputFile, currentLine)){
-               //Now we need to compress each line
-               std::vector<int> compressed;
-               compress(currentLine, std::back_inserter(compressed));
-               //Now that we have the compressed version, we need to write it to the output file
-               std::ofstream outputFile(outputFileName);
-               for(auto itr=compressed.begin(); itr != compressed.end(); itr++){
-                  //if the file is open, write to it
-                  if(outputFile.is_open()){
-                     outputFile << *itr;
-                  }
-                  //else error opening file
-                  else{
-                     std::cout << "Error opening output file: " << outputFileName << "\n";
-                  }
-               }
-            }
-         }
-         else{
-            std::cout << "Error: Could not open file given.\n";
-         }
-         std::cout << "Compresion completed. \nFinalized document: " << outputFileName << "\n";
+         //Here we need to compress any file given
+         //create a file to read from given the input filename
+         std::string inputFileName = argv[2];
+         std::cout << inputFileName;
+
       }else if(argv[1][0] == 'e'){
-         std::cout << "Expanding the document...";
       }
-   }
-   /*
+   } 
+   
   std::vector<int> compressed;
   compress("AAAAAAABBBBBB", std::back_inserter(compressed));
   for(auto itr=compressed.begin(); itr !=compressed.end(); itr++)
@@ -247,7 +220,7 @@ int main(int argc, char *argv[]) {
   std::cout << "\nfinal decompressed:" << decompressed << std::endl;
   
   //demo as the name suggests
-  binaryIODemo(compressed); */
+  binaryIODemo(compressed); 
   
   return 0;
 }
