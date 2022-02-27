@@ -218,12 +218,8 @@ int main(int argc, char *argv[]) {
          //read in the input character by character
          while(inputFile.get(currentChar)){
             int currentInt = (int) currentChar;
-            binaryString += int2BinaryString(currentInt, fileSize);
+            binaryString = binaryString + int2BinaryString(currentInt, fileSize);
          }
-         std::cout << "Binary String: " << binaryString << "\n";
-
-         
-
 
       }else if(argv[1][0] == 'e'){
       }
