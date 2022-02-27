@@ -207,12 +207,16 @@ int main(int argc, char *argv[]) {
          std::string inputFileName = argv[2];
          std::ifstream inputFile;
          inputFile.open(inputFileName.c_str(), std::ios::binary);
+
          //get the size of the file in bytes
          struct stat fileStatus;
          stat(inputFileName.c_str(), &fileStatus);
          long fileSize = fileStatus.st_size;
-         std::cout << fileSize;
 
+         //read into a char array the contents of a file
+         char characterArray[fileSize];
+         inputFile.read(characterArray, fileSize);
+         std::cout << characterArray;
          
 
 
