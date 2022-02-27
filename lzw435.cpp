@@ -220,6 +220,17 @@ int main(int argc, char *argv[]) {
             int currentInt = (int) currentChar;
             binaryString = binaryString + int2BinaryString(currentInt, fileSize);
          }
+         std::cout << "Binary String: " << binaryString << "\n";
+         //store the binary string in a vector called compressed and compress them
+         std::vector<int> compressed;
+         compress(binaryString, std::back_inserter(compressed));
+         
+         //now that they are compressed write them to an output file.
+         std::string outFileName = inputFileName + ".lzw";
+         std::cout << "Output File Name: " << outFileName << "\n";
+         for(auto itr=compressed.begin(); itr != compressed.end(); itr++){
+            std::cout<< "Compressed: " << *itr << "\n";
+         }
 
       }else if(argv[1][0] == 'e'){
       }
