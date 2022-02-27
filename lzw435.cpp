@@ -205,7 +205,16 @@ int main(int argc, char *argv[]) {
          //Here we need to compress any file given
          //create a file to read from given the input filename
          std::string inputFileName = argv[2];
-         std::cout << inputFileName;
+         std::ifstream inputFile;
+         inputFile.open(inputFileName.c_str(), std::ios::binary);
+         //get the size of the file in bytes
+         struct stat fileStatus;
+         stat(inputFileName.c_str(), &fileStatus);
+         long fileSize = fileStatus.st_size;
+         std::cout << fileSize;
+
+         
+
 
       }else if(argv[1][0] == 'e'){
       }
