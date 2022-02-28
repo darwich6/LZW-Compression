@@ -202,61 +202,73 @@ int main(int argc, char *argv[]) {
       std::cout << "For expansion of a file, please enter: \n lzw435 e filename \n"; 
    } else {
       if(argv[1][0] == 'c'){
-         //Here we need to compress any file given
-         //create a file to read from given the input filename
-         std::string inputFileName = argv[2];
+
+         //Here we need to compress a given file
+         //Our first task is to read the input from the compressed file
+         std::string fileName = argv[2];
          std::ifstream inputFile;
-         inputFile.open(inputFileName.c_str(), std::ios::binary);
-
-         //get the size of the file in bytes
+         inputFile.open(fileName.c_str());
+   
+         //Get the size of a file in bytes
          struct stat fileStatus;
-         stat(inputFileName.c_str(), &fileStatus);
+         stat(fileName.c_str(), &fileStatus );
          long fileSize = fileStatus.st_size;
+   
+         //Read in the file byte by byte
+         char characterArray[fileSize];
+         inputFile.read(characterArray, fileSize);
 
-         //read in the input line by line
-         char totalString[fileSize];
-         inputFile.read(totalString, fileSize);
+         //close the input file
          inputFile.close();
 
-         std::cout << "Total String: " << totalString << "\n";
+         //Test to see if we read in the values correctly
+         std::cout << "Input String: " << characterArray << "\n";
 
-         //compress the inputted string
+         //Now we need to compress the input
          std::vector<int> compressed;
-         compress(totalString, std::back_inserter(compressed));
+         compress(characterArray, std::back_inserter(compressed));
 
-         //convert the compressed string into a binary string
+         //The compressed should be a vector of ints representing the input. 
+         //We now need to convert those to binary strings.
          std::string currentBString = "";
          std::string totalBString = "";
-         for(std::vector<int>::iterator it = compressed.begin(); it != compressed.end(); ++it){
-            //Assuming 12 bits
-            int bits = 12;
-            currentBString = int2BinaryString(*it, bits);
-            std::cout << "value=" << *it <<" : binary string="<<currentBString<<"; back to code=" << binaryString2Int(currentBString)<<"\n";
-            totalBString += currentBString;
+         //asumme 12 bits
+         int bits = 12;
+          for(auto itr=compressed.begin(); itr !=compressed.end(); ++itr){
+               currentBString = int2BinaryString(*itr, bits);
+               //append it to a final string
+               totalBString += currentBString;
+          }
+         //test to see if the total string is binary
+         std::cout << "Total Binary String: " << totalBString << "\n";
+
+         //now we need to write this binary string to an output file
+         std::string outputName = fileName + ".lzw";
+         std::ofstream outputFile;
+         outputFile.open(outputName.c_str(),  std::ios::binary);
+
+         //make sure the length of the binary string is a multiple of 8
+         std::string zeros = "00000000";
+         if(totalBString.size() % 8 != 0){
+            totalBString += zeros.substr(0, 8 - totalBString.size() % 8);
          }
-         //we must make sure the length of the binary string is a multiple of 12 before we can write to the file
-         std::string zeros = "000000000000";
-         std::string outputFileName = inputFileName + ".lzw";
-         std::ofstream outputFile(outputFileName);
-         if(totalBString.size() % 12 != 0){
-            totalBString += zeros.substr(0, 12 - totalBString.size() % 12);
-         }
-         int b;
-         for(int i = 0; i < totalBString.size(); i += 12 ){
-            b = 1;
-            for(int j = 0; j < 12; j++){
+
+         std::cout << "Binary String as Multiple of 8: " << totalBString;
+         for(int i = 0; i < totalBString.size(); i += 8){
+            int b = 1;
+            for(int j = 0; j < 8; j++){
                b = b << 1;
                if(totalBString.at(i+j) == '1'){
                   b+=1;
                }
             }
-            //write to the file byte by byte
-            char currentChar = (char) (b & 255);
-            outputFile.write(&currentChar, 1);
+            char c = (char) (b & 255);
+            outputFile.write(&c, 1);
          }
          outputFile.close();
+
       }else if (argv[1][0] == 'e'){
-         //Here we need to expand the given file
+         /*//Here we need to expand the given file
          //create a file to read from given the input filename
          std::string inputFileName = argv[2];
          std::ifstream inputFile;
@@ -307,11 +319,11 @@ int main(int argc, char *argv[]) {
             std::cerr << "Error opening output file.";
             exit(1);
          }
-         outputFile.close();
-      }
+         outputFile.close();  */
+      } 
    }
 
-   /*
+  /* 
   std::vector<int> compressed;
   compress("AAAAAAABBBBBB", std::back_inserter(compressed));
   for(auto itr=compressed.begin(); itr !=compressed.end(); itr++)
