@@ -216,14 +216,14 @@ int main(int argc, char *argv[]) {
    
          //Read in the file byte by byte
          /*char characterArray[fileSize];
-         inputFile.read(characterArray, fileSize); */
+         inputFile.read(characterArray, fileSize);  */
          std::string fileContent = std::string((std::istreambuf_iterator<char>(inputFile)), std::istreambuf_iterator<char>());
-
+   
          //close the input file
          inputFile.close();
 
          //Test to see if we read in the values correctly
-         std::cout << "Input String: " << inputFile << "\n";
+         std::cout << "Input String: " << fileContent << "\n";
 
          //Now we need to compress the input
          std::vector<int> compressed;
@@ -234,13 +234,8 @@ int main(int argc, char *argv[]) {
          std::string currentBString = "";
          std::string totalBString = "";
          //asumme 12 bits
-         int bits;
+         int bits = 12;
           for(auto itr=compressed.begin(); itr !=compressed.end(); ++itr){
-               if (*itr<256)
-                  bits = 8; 
-               else
-                  bits = 9;
-               bits = 12;
                currentBString = int2BinaryString(*itr, bits);
                std::cout << "c=" << *itr <<" : binary string="<<currentBString<<"; back to code=" << binaryString2Int(currentBString)<<"\n";
                //append it to a final string
@@ -257,116 +252,112 @@ int main(int argc, char *argv[]) {
          //make sure the length of the binary string is a multiple of 8
          std::string zeros = "00000000";
          if(totalBString.size() % 8 != 0){
-            totalBString += zeros.substr(0, 8 - totalBString.size() % 8);
+            totalBString += zeros.substr(0, 8-totalBString.size()%8);
          }
 
-         std::cout << "Binary String as Multiple of 8: " << totalBString;
-         for(int i = 0; i < totalBString.size(); i += 8){
-            int b = 1;
-            for(int j = 0; j < 8; j++){
-               b = b << 1;
-               if(totalBString.at(i+j) == '1'){
+         std::cout << "Binary String as Multiple of 8: " << totalBString << "\n";
+         int b; 
+         for (int i = 0; i < totalBString.size(); i+=8) { 
+            b = 1;
+            for (int j = 0; j < 8; j++) {
+               b = b<<1;
+               if (totalBString.at(i+j) == '1')
                   b+=1;
-               }
             }
-            char c = (char) (b & 255);
-            outputFile.write(&c, 1);
-         }
+            char c = (char) (b & 255); //save the string byte by byte
+            outputFile.write(&c, 1);  
+         } 
          outputFile.close();
 
       }else if (argv[1][0] == 'e'){
-         //Here we need to expand the given file
-         //create a file to read from given the input filename
-         std::string inputFileName = argv[2];
-         std::ifstream inputFile;
-         inputFile.open(inputFileName.c_str(), std::ios::binary);
+         try 
+         {
+            //Here we need to expand the given file
+            //create a file to read from given the input filename
+            std::string inputFileName = argv[2];
+            std::ifstream inputFile;
+            inputFile.open(inputFileName.c_str(), std::ios::binary);
 
-         //get the size of the file in bytes
-         struct stat fileStatus;
-         stat(inputFileName.c_str(), &fileStatus);
-         long fileSize = fileStatus.st_size;
+            //get the size of the file in bytes
+            struct stat fileStatus;
+            stat(inputFileName.c_str(), &fileStatus);
+            long fileSize = fileStatus.st_size;
 
-         //read in the contents into a character array
-         char characterArray[fileSize];
-         inputFile.read(characterArray, fileSize);
+            //read in the contents into a character array
+            char characterArray[fileSize];
+            inputFile.read(characterArray, fileSize);
 
-         //test to see if you read the contents in correctly
-         //std::cout << "Input file contents: " << characterArray << "\n";
+            //test to see if you read the contents in correctly
+            //std::cout << "Input file contents: " << characterArray << "\n";
 
-         //check to see if they are corrent binary strings
-         std::string zeros = "00000000";
-         std::string totalBinaryString = "";
-         int counter = 0;
-         while(counter < fileSize){
-            unsigned char currentChar = (unsigned char) characterArray[counter];
-            std::string currentBString = "";
-            for(int j = 0; j < 8 && currentChar > 0; j++){
-               if(currentChar % 2 == 0){
-                  currentBString = "0" + currentBString;
-               }else{
-                  currentBString = "1" + currentBString;
+            //check to see if they are corrent binary strings
+            std::string zeros = "00000000";
+            std::string totalBinaryString = "";
+            int counter = 0;
+            while(counter < fileSize){
+               unsigned char currentChar = (unsigned char) characterArray[counter];
+               std::string currentBString = "";
+               for(int j = 0; j < 8 && currentChar > 0; j++){
+                  if(currentChar % 2 == 0){
+                     currentBString = "0" + currentBString;
+                  }else{
+                     currentBString = "1" + currentBString;
+                  }
+                  currentChar = currentChar >> 1;
                }
-               currentChar = currentChar >> 1;
+               //pad 0s to left if needed
+               currentBString = zeros.substr(0, 8-currentBString.size()) + currentBString;
+               totalBinaryString += currentBString;
+               counter++;
             }
-            //pad 0s to left if needed
-            currentBString = zeros.substr(0, 8-currentBString.size()) + currentBString;
-            totalBinaryString += currentBString;
-            counter++;
-         }
 
-         //test to see if the contents are trule a binary string
-         //std::cout << "Total Binary String: " << totalBinaryString << "\n";
+            //test to see if the contents are trule a binary string
+            std::cout << "Total Binary String: " << totalBinaryString << "\n";
 
-         //close the input file
-         inputFile.close();
+            //close the input file
+            inputFile.close();
 
-         //now store 12 chars of the binary string into elements of an int vector
-         std::vector<int> compressed;
-         for(int i = 0; i < totalBinaryString.size(); i+=12){
-            auto smallBString = totalBinaryString.substr(i, 12);
-            compressed.push_back(binaryString2Int(smallBString));
-         }
+            //now store 12 chars of the binary string into elements of an int vector
+            std::vector<int> compressed;
+            for(int i = 0; i < totalBinaryString.size(); i+=12){
+               auto smallBString = totalBinaryString.substr(i, 12);
+               compressed.push_back(binaryString2Int(smallBString));
+               //remove padding
+               //i = i + 4;
+            }
          
-         //so now compressed should hold integers values to represent twelve bits of the binary string
-         //test to see if its true
-         /*
-         std::cout << "Compressed: " << "\n";
-         for(auto itr=compressed.begin(); itr !=compressed.end(); itr++){
-            std::cout<<"\n"<<*itr;
-         } */
+            //so now compressed should hold integers values to represent twelve bits of the binary string
+            //test to see if its true
+         
+            /*std::cout << "Compressed: " << "\n";
+            for(auto itr=compressed.begin(); itr !=compressed.end(); itr++){
+               std::cout<<"\n"<<*itr;
+            }  */
 
-         // Now that we have the compressed contents, we need to decompress it.
-         std::string finalString = decompress(compressed.begin(), compressed.end());
+            // Now that we have the compressed contents, we need to decompress it.
+            std::string finalString = decompress(compressed.begin(), compressed.end());
 
-         // Test to see if it is truly the final String
-         std::cout << "\n" << "Final String: " << finalString << "\n";
+            // Test to see if it is truly the final String
+            //std::cout << "\n" << "Final String: " << finalString << "\n"; 
 
-         // Now we need to write this to the output file
-         std::string outputFileName = inputFileName.substr(0, inputFileName.size() - 8).append("2.txt");
-         //test to see if its in the format of "filename2"
-         std::cout << "Output Filename: " << outputFileName;
-         //create output file
-         std::ofstream outputFile(outputFileName);
-         //write to the file
-         outputFile << finalString;
+            // Now we need to write this to the output file
+            std::string outputFileName = inputFileName.substr(0, inputFileName.size() - 8).append("2.txt");
+            //test to see if its in the format of "filename2"
+            std::cout << "Output Filename: " << outputFileName;
+            //create output file
+            std::ofstream outputFile(outputFileName);
+            //write to the file
+            outputFile << finalString;
 
-         //close the file
-         outputFile.close();
+            //close the file
+            outputFile.close(); 
 
-      } 
+         } 
+         catch(char const* e)
+         {
+            std::cerr << e << '\n';
+         }
+      }
    }
 
-  /* 
-  std::vector<int> compressed;
-  compress("AAAAAAABBBBBB", std::back_inserter(compressed));
-  for(auto itr=compressed.begin(); itr !=compressed.end(); itr++)
-        std::cout<<"\n"<<*itr;
-          
-  std::string decompressed = decompress(compressed.begin(), compressed.end());
-  std::cout << "\nfinal decompressed:" << decompressed << std::endl;
-  
-  //demo as the name suggests
-  binaryIODemo(compressed); */
-  
-  return 0;
 }
