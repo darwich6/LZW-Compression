@@ -321,7 +321,11 @@ int main(int argc, char *argv[]) {
             std::vector<int> compressed;
             for(int i = 0; i < totalBinaryString.size(); i+=12){
                auto smallBString = totalBinaryString.substr(i, 12);
-               compressed.push_back(binaryString2Int(smallBString));
+               int currentInt = binaryString2Int(smallBString);
+               if(currentInt != 0){
+                  compressed.push_back(currentInt);
+               }
+               //compressed.push_back(binaryString2Int(smallBString));
                //remove padding
                //i = i + 4;
             }
