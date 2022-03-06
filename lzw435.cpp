@@ -118,83 +118,7 @@ int binaryString2Int(std::string p) {
    return code;
 }
 
-void binaryIODemo(std::vector<int> compressed) {
-   //example for integer c; looking for a 9 bit code
-   int c = 69;
-   int bits = 9; //length of the code
-   std::string p = int2BinaryString(c, bits);
-   std::cout << "c=" << c <<" : binary string="<<p<<"; back to code=" << binaryString2Int(p)<<"\n";
-   
-   std::string bcode= "";
-   for (std::vector<int>::iterator it = compressed.begin() ; it != compressed.end(); ++it) {
-   
-      if (*it<256)
-         bits = 8; 
-      else
-         bits = 9;
-      
-      //assuming 12 bits
-      bits = 12;
-      p = int2BinaryString(*it, bits);
-      std::cout << "c=" << *it <<" : binary string="<<p<<"; back to code=" << binaryString2Int(p)<<"\n";
-      bcode+=p;
-   }
-   
-   //writing to file
-   std::cout << "string 2 save : "<<bcode << "\n";
-   std::string fileName = "example435.lzw"; //this is for demo you should not hard code the final name.
-   std::ofstream myfile;
-   myfile.open(fileName.c_str(),  std::ios::binary);
-   
-   std::string zeros = "00000000";
-   if (bcode.size()%8!=0) //make sure the length of the binary string is a multiple of 8
-      bcode += zeros.substr(0, 8-bcode.size()%8);
-   
-   int b; 
-   for (int i = 0; i < bcode.size(); i+=8) { 
-      b = 1;
-      for (int j = 0; j < 8; j++) {
-         b = b<<1;
-         if (bcode.at(i+j) == '1')
-           b+=1;
-      }
-      char c = (char) (b & 255); //save the string byte by byte
-      myfile.write(&c, 1);  
-   }
-   myfile.close();
-   
-   //reading from a file
-   std::ifstream myfile2;
-   myfile2.open (fileName.c_str(),  std::ios::binary);
-   
-   struct stat filestatus;
-   stat(fileName.c_str(), &filestatus );
-   long fsize = filestatus.st_size; //get the size of the file in bytes
-   
-   char c2[fsize];
-   myfile2.read(c2, fsize);
-   
-   std::string s = "";
-   long count = 0;
-   while(count<fsize) {
-      unsigned char uc =  (unsigned char) c2[count];
-      std::string p = ""; //a binary string
-      for (int j=0; j<8 && uc>0; j++) {         
-		   if (uc%2==0)
-            p="0"+p;
-         else
-            p="1"+p;
-         uc=uc>>1;   
-      }
-      p = zeros.substr(0, 8-p.size()) + p; //pad 0s to left if needed
-      s+= p; 
-      count++;
-   } 
-   myfile2.close();
-   std::cout << " saved string : "<<s << "\n"; 
-}
- 
-// demo of how LZW works
+// LZW Compression with file input and output
 
 int main(int argc, char *argv[]) {
    if((argc != 3 || argv[1][0]!='c') && (argc !=3 || argv[1][0]!='e')){
@@ -208,6 +132,10 @@ int main(int argc, char *argv[]) {
          std::string fileName = argv[2];
          std::ifstream inputFile;
          inputFile.open(fileName.c_str());
+
+         //print to screen
+         std::cout << "Compressing: " << fileName.c_str() << "\n";
+         std::cout << "Please wait... \n";
    
          //Get the size of a file in bytes
          struct stat fileStatus;
@@ -223,7 +151,7 @@ int main(int argc, char *argv[]) {
          inputFile.close();
 
          //Test to see if we read in the values correctly
-         std::cout << "Input String: " << fileContent << "\n";
+         //std::cout << "Input String: " << fileContent << "\n";
 
          //Now we need to compress the input
          std::vector<int> compressed;
@@ -237,12 +165,13 @@ int main(int argc, char *argv[]) {
          int bits = 12;
           for(auto itr=compressed.begin(); itr !=compressed.end(); ++itr){
                currentBString = int2BinaryString(*itr, bits);
-               std::cout << "c=" << *itr <<" : binary string="<<currentBString<<"; back to code=" << binaryString2Int(currentBString)<<"\n";
+               //test to see conversion
+               //std::cout << "c=" << *itr <<" : binary string="<<currentBString<<"; back to code=" << binaryString2Int(currentBString)<<"\n";
                //append it to a final string
                totalBString += currentBString;
           }
          //test to see if the total string is binary
-         std::cout << "Total Binary String: " << totalBString << "\n";
+         //std::cout << "Total Binary String: " << totalBString << "\n";
 
          //now we need to write this binary string to an output file
          std::string outputName = fileName + ".lzw";
@@ -255,7 +184,7 @@ int main(int argc, char *argv[]) {
             totalBString += zeros.substr(0, 8-totalBString.size()%8);
          }
 
-         std::cout << "Binary String as Multiple of 8: " << totalBString << "\n";
+         //std::cout << "Binary String as Multiple of 8: " << totalBString << "\n";
          int b; 
          for (int i = 0; i < totalBString.size(); i+=8) { 
             b = 1;
@@ -269,6 +198,10 @@ int main(int argc, char *argv[]) {
          } 
          outputFile.close();
 
+         //print to screen results
+         std::cout << "Compression complete. \n";
+         std::cout << "Compression written to: " << outputName.c_str() << "\n";
+
       }else if (argv[1][0] == 'e'){
          try 
          {
@@ -277,6 +210,10 @@ int main(int argc, char *argv[]) {
             std::string inputFileName = argv[2];
             std::ifstream inputFile;
             inputFile.open(inputFileName.c_str(), std::ios::binary);
+
+            //print
+            std::cout << "Expanding file: " << inputFileName.c_str() << "\n";
+            std::cout << "Please wait... \n";
 
             //get the size of the file in bytes
             struct stat fileStatus;
@@ -312,7 +249,7 @@ int main(int argc, char *argv[]) {
             }
 
             //test to see if the contents are trule a binary string
-            std::cout << "Total Binary String: " << totalBinaryString << "\n";
+            //std::cout << "Total Binary String: " << totalBinaryString << "\n";
 
             //close the input file
             inputFile.close();
@@ -347,7 +284,7 @@ int main(int argc, char *argv[]) {
             // Now we need to write this to the output file
             std::string outputFileName = inputFileName.substr(0, inputFileName.size() - 8).append("2.txt");
             //test to see if its in the format of "filename2"
-            std::cout << "Output Filename: " << outputFileName;
+            //std::cout << "Output Filename: " << outputFileName;
             //create output file
             std::ofstream outputFile(outputFileName);
             //write to the file
@@ -355,6 +292,10 @@ int main(int argc, char *argv[]) {
 
             //close the file
             outputFile.close(); 
+
+            //print to screen results
+            std::cout << "Expansion complete. \n";
+            std::cout << "Expansion written to: " << outputFileName.c_str() << "\n";
 
          } 
          catch(char const* e)
